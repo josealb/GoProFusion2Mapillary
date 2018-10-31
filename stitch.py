@@ -1,4 +1,5 @@
 import sys
+import os
 import subprocess
 import argparse
 
@@ -15,28 +16,30 @@ if __name__ == '__main__':
     default=0)
 
     args = parser.parse_args()
+    if not os.path.exists(args.output_path):
+        os.mkdir(args.output_path)
+    back_folder = args.files_path+'/back/DCIM'
+    subdirs = [x[0] for x in os.walk(back_folder)] 
+    subdirs.pop(0)
 
-    working_dir_windows = 'C:/Program Files/GoPro/Fusion Studio 1.3'
-    working_dir_mac = '/Applications/Fusion Studio 1.3.app/Contents/MacOS'
-    files_dir_windows = 'E:/Dropbox/Work/Mapillary/Data/gopro_fusion'
-    files_dir_mac = '/Users/josealbertosoler/Dropbox/Work/Mapillary/Data/gopro_fusion'
+    for directory in subdirs:
+        images = [x for x in os.walk(directory)] 
+        images=images[0][2]
+        back_folder_name = os.path.basename(directory)
+        output_directory = args.output_path+'/'+back_folder_name.replace('BACK','')
+        if not os.path.exists(output_directory):
+            os.mkdir(output_directory)
+        for image in images:
+            back_image = directory+'/'+image
+            front_folder_name = back_folder_name.replace('BACK','FRNT')
+            front_folder_path = os.path.dirname(directory)+'/'+front_folder_name
+            front_folder_path = front_folder_path.replace('/gopro_fusion/back/DCIM/','/gopro_fusion/front/DCIM/')
+            front_image = front_folder_path+'/'+os.path.basename(back_image).replace('GB','GF')
+            output_file = os.path.basename(back_image).replace('GB','Stitched')
 
-    files_dir = files_dir_mac
-    working_dir = working_dir_mac
+            command_mac = './FusionStudio --front '+front_image+' --back '+back_image + ' --output '+ output_directory+'/'+output_file + ' --parallaxCompensation '+ str(args.parallax_compensation)
+            command = command_mac
+            print(command_mac)
+            result = subprocess.run(command,shell=True,cwd=args.fusion_path)
+
     
-    parallax_compensation = 0
-    #result = subprocess.run('dir',shell=True,cwd=working_dir)
-    #result = subprocess.run('FusionStudio_x64.exe --help',shell=True,cwd=working_dir)
-    
-    front_image = 'E:/Dropbox/Work/Mapillary/Data/gopro_fusion/FRONT/DCIM/103GFRNT/GF055000.JPG'
-    back_image = 'E:/Dropbox/Work/Mapillary/Data/gopro_fusion/BACK/DCIM/103GBACK/GB055000.JPG'
-
-    front_image = '/Users/josealbertosoler/Dropbox/Work/Mapillary/Data/gopro_fusion/FRONT/DCIM/103GFRNT/GF055000.JPG'
-    back_image = '/Users/josealbertosoler/Dropbox/Work/Mapillary/Data/gopro_fusion/BACK/DCIM/103GBACK/GB055000.JPG'
-
-    command_windows = 'FusionStudio_x64.exe --front '+front_image+' --back '+back_image + ' --output '+ files_dir + '/test.jpg' + ' --parallaxCompensation '+ str(parallax_compensation)
-    command_mac = './FusionStudio --front '+front_image+' --back '+back_image + ' --output '+ files_dir + '/test.jpg' + ' --parallaxCompensation '+ str(parallax_compensation)
-    
-    command = command_mac
-    result = subprocess.run(command,shell=True,cwd=working_dir)
-    print (command)
