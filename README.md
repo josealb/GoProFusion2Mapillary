@@ -20,7 +20,7 @@ git clone https://github.com/josealb/GoProFusion2Mapillary.git
 To view available functionalities run the -h command
 
 ```
-stitch.py [-h] [--fusion_path FUSION_PATH] [--files_path FILES_PATH]
+stitch_gpfusion_images.py [-h] [--fusion_path FUSION_PATH] [--files_path FILES_PATH]
                  [--output_path OUTPUT_PATH]
                  [--parallax_compensation PARALLAX_COMPENSATION]
 
